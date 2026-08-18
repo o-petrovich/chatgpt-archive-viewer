@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChatGPT Archive Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand-row">
+      <div class="brand">ChatGPT Archive</div>
+      <button id="addArchiveBtn" class="add-btn" title="Додати архів">＋</button>
+    </div>
+    <input id="search" class="search" placeholder="Пошук архівів…">
+    <div id="chatList" class="chat-list"></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="chat-heading">
+        <div id="title" class="title">Оберіть архів</div>
+        <div id="meta" class="meta"></div>
+      </div>
+      <div class="chat-search-box">
+        <input id="chatSearch" class="chat-search" type="search" placeholder="Пошук у чаті..." autocomplete="off">
+        <span id="chatSearchCount" class="chat-search-count">0 / 0</span>
+        <button id="chatSearchPrev" class="chat-search-nav" title="Попередній">↑</button>
+        <button id="chatSearchNext" class="chat-search-nav" title="Наступний">↓</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="toc">
+        <div class="toc-tabs">
+          <button id="tocTab" class="toc-tab active">Зміст</button>
+          <button id="questionsTab" class="toc-tab">Питання</button>
+        </div>
+
+        <div id="tocList" class="toc-list"></div>
+      </aside>
+      <section id="chatScroll" class="chat-scroll">
+        <div id="messages" class="messages empty">Оберіть чат у списку ліворуч.</div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="importModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Додати архів</div>
+        <div id="downloadsPath" class="modal-sub"></div>
+      </div>
+      <button id="closeImportBtn" class="icon-btn">✕</button>
+    </div>
+    <div id="candidateList" class="candidate-list"></div>
+    <div id="importStatus" class="import-status"></div>
+    <div class="modal-actions">
+      <button id="cancelImportBtn" class="secondary-btn">Скасувати</button>
+      <button id="confirmImportBtn" class="primary-btn" disabled>Додати архів</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
