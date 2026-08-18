@@ -1,89 +1,89 @@
 # ChatGPT Archive Viewer
 
-`ChatGPT Archive Viewer` — локальна програма для збереження та зручного перегляду окремих розмов ChatGPT у вигляді архіву.
+**English** | [Українська](README_UA.md)
 
-Ідея проста:
+**ChatGPT Archive Viewer** is a local viewer and archive manager for exported ChatGPT conversations.
+
+It preserves messages, images and attachments, provides full-text navigation, and adds a **semantic table of contents** for long conversations. Unlike ordinary text search, semantic topics can point directly to the exact part of a conversation where a project stage, experiment, decision, or conclusion was discussed.
 
 ```text
 ChatGPT
    ↓
 ChatGPT Helper
    ↓
-файли експорту в ~/Downloads
+export files in ~/Downloads
    ↓
 ChatGPT Archive Viewer
    ↓
-локальний архів чатів з повідомленнями та вкладеннями
+local archive with conversations and attachments
 ```
 
-Viewer не потребує повторного відкривання старої розмови на сайті ChatGPT: після імпорту чат, його зображення та інші вкладення зберігаються локально.
+After import, a conversation can be viewed locally without reopening the original chat on the ChatGPT website.
 
-> Проєкт зараз активно розробляється, але базовий цикл архівації, перегляду, пошуку, режиму «Питання» та семантичного «Змісту» вже реалізований і працює.
+> The project is under active development, but the core workflow — archiving, viewing, search, Questions navigation, and the semantic Table of Contents — is already implemented and working.
 
 ---
 
-## 1. Що таке ChatGPT Helper
+## 1. What is ChatGPT Helper?
 
-[`D1DX/chatgpt-helper`](https://github.com/D1DX/chatgpt-helper) — окреме Chrome-розширення для експорту розмов і memories з ChatGPT.
+[`D1DX/chatgpt-helper`](https://github.com/D1DX/chatgpt-helper) is a separate Chrome extension used to export ChatGPT conversations and attachments.
 
-Сам `ChatGPT Archive Viewer` не завантажує розмову безпосередньо з ChatGPT. Його задача інша: прийняти вже створений Helper-ом export, розкласти його у локальний архів і показати у зручному HTML-viewer.
+ChatGPT Archive Viewer does **not** download conversations directly from ChatGPT. Instead, ChatGPT Helper creates the export, and Archive Viewer imports it into a local archive and renders it in a convenient HTML interface.
 
-ChatGPT Helper працює через активну сесію ChatGPT у браузері, викликає внутрішній web API ChatGPT і може експортувати розмови в JSON, Markdown, JSONL, HTML, CSV або plain text. Для нашого Viewer потрібен саме **JSON export з attachments**.
+For Archive Viewer, use a **JSON export with attachments**.
 
-За документацією Helper, обробка виконується локально у браузері; зовнішній сервер для передачі архіву не використовується. Водночас автор прямо попереджає, що розширення використовує недокументований внутрішній API ChatGPT, який може змінюватися.
+### Installing ChatGPT Helper
 
-### Встановлення ChatGPT Helper
-
-Клонуйте репозиторій:
+Clone the Helper repository:
 
 ```bash
 git clone https://github.com/D1DX/chatgpt-helper.git
 ```
 
-Потім у Chrome:
+Then in Chrome:
 
-1. Відкрийте `chrome://extensions`.
-2. Увімкніть **Developer mode**.
-3. Натисніть **Load unpacked**.
-4. Виберіть каталог `chatgpt-helper`, який щойно клонували.
-5. Іконка **ChatGPT Helper** з'явиться на панелі розширень Chrome.
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select the cloned `chatgpt-helper` directory.
+5. Pin the **ChatGPT Helper** extension if desired.
 
-Перед використанням відкрийте `chatgpt.com` і переконайтеся, що ви увійшли у свій обліковий запис.
+Before exporting, open `chatgpt.com` and make sure you are signed in.
 
 ---
 
-## 2. Як отримати архів конкретної розмови
+## 2. Exporting a conversation
 
-Для одного чату достатньо його Conversation ID.
+A single conversation can be exported using its Conversation ID.
 
-Наприклад, якщо адреса має вигляд:
+For example, for:
 
 ```text
 https://chatgpt.com/c/6a7f4b0d-4e70-83ed-9060-e7234ac3ea0d
 ```
 
-то Conversation ID:
+the Conversation ID is:
 
 ```text
 6a7f4b0d-4e70-83ed-9060-e7234ac3ea0d
 ```
 
-Далі:
+Then:
 
-1. Відкрийте потрібний чат на `chatgpt.com`.
-2. Скопіюйте Conversation ID з адресного рядка браузера — це частина після `/c/`.
-3. Відкрийте **ChatGPT Helper**.
-4. Перейдіть у **Export Conversations**.
-5. Виберіть **By IDs**.
-6. Вставте Conversation ID.
-7. У секції **Fetch** залиште увімкненими `Conversations` і `Attachments`.
-8. У секції **Output** виберіть `ZIP (auto-split 100 MB)`.
-9. Натисніть **Run**.
-10. Дочекайтеся повідомлення `Done`.
+1. Open the conversation on `chatgpt.com`.
+2. Copy the Conversation ID from the URL — the part after `/c/`.
+3. Open **ChatGPT Helper**.
+4. Go to **Export Conversations**.
+5. Select **By IDs**.
+6. Paste the Conversation ID.
+7. Under **Fetch**, enable `Conversations` and `Attachments`.
+8. Under **Output**, select `ZIP (auto-split 100 MB)`.
+9. Click **Run**.
+10. Wait for `Done`.
 
-Helper збереже набір файлів у стандартну папку браузера **Downloads**.
+The Helper saves the export set into the browser's standard **Downloads** directory.
 
-Типовий export:
+A typical export contains:
 
 ```text
 chatgpt-run-..._conversations.json
@@ -92,22 +92,22 @@ chatgpt-run-..._attachments-vol01.zip
 chatgpt-run-..._run-manifest.json
 ```
 
-Якщо вкладень багато, ZIP-томів може бути декілька. **Не потрібно вручну розпаковувати ZIP.** Viewer зробить це під час імпорту.
+Large exports may contain multiple attachment ZIP volumes. **Do not unpack them manually.** Archive Viewer handles them during import.
 
 ---
 
-## 3. Встановлення ChatGPT Archive Viewer
+## 3. Installing ChatGPT Archive Viewer
 
-Потрібен Python 3 і Git.
+Requirements: Python 3 and Git.
 
 ```bash
 git clone git@github.com:o-petrovich/chatgpt-archive-viewer.git
 cd chatgpt-archive-viewer
 ```
 
-На поточному етапі проєкт використовує лише стандартні Python-модулі, тому окремий `pip install` не потрібен.
+The current version uses Python's standard library only, so no separate `pip install` step is required.
 
-### Структура програми
+### Project structure
 
 ```text
 ChatGPT_Archive/
@@ -120,7 +120,7 @@ ChatGPT_Archive/
 │   ├── toc-rules.md
 │   └── style.css
 ├── chats/
-│   └── 2026-08-07_Назва-чату/
+│   └── 2026-08-07_Conversation-title/
 │       ├── conversation.json
 │       ├── attachments-index.json
 │       ├── attachments/
@@ -130,276 +130,276 @@ ChatGPT_Archive/
 └── view.py
 ```
 
-`chats/` містить локальні архіви. `catalog.json` — каталог чатів для Viewer.
+`chats/` contains local conversation archives. `catalog.json` is the Viewer's local conversation catalog. Both are intentionally excluded from Git.
 
 ---
 
-## 4. Запуск
+## 4. Running the Viewer
 
 ```bash
 python3 view.py
 ```
 
-`view.py` запускає локальний HTTP-сервер тільки на `127.0.0.1`, вибирає вільний порт та автоматично відкриває Viewer у браузері.
+`view.py` starts a local HTTP server bound only to `127.0.0.1`, selects a free local port, and opens the Viewer in your browser.
 
-Для завершення сервера натисніть `Ctrl+C`.
-
----
-
-## 5. Додавання нового архіву
-
-У лівому верхньому куті Viewer є кнопка `+`.
-
-Після натискання Viewer знаходить у `~/Downloads` доступні `*_conversations.json`, перевіряє комплект export-файлів і дозволяє вибрати потрібний архів.
-
-Після успішного імпорту:
-
-- створюється окрема папка чату в `chats/`;
-- зберігається `conversation.json`;
-- копіюються вкладення;
-- створюється локальний `attachments-index.json`;
-- створюється початковий `topics.json`;
-- оновлюється `catalog.json`;
-- вихідні файли цього export з `~/Downloads` видаляються.
+Press `Ctrl+C` in the terminal to stop it.
 
 ---
 
-## 6. Список архівних чатів
+## 5. Adding an archive
 
-Ліва колонка містить усі імпортовані розмови.
+Click the `+` button in the upper-left corner.
 
-Для кожного чату показуються:
+The Viewer looks in `~/Downloads` for available `*_conversations.json` files, checks the matching export set, and lets you choose which archive to import.
+
+After a successful import:
+
+- a separate conversation directory is created under `chats/`;
+- `conversation.json` is stored;
+- attachments are copied locally;
+- a local `attachments-index.json` is created;
+- an initial `topics.json` is created;
+- `catalog.json` is updated;
+- the processed source export files are removed from `~/Downloads`.
+
+---
+
+## 6. Conversation list
+
+The left column contains all imported conversations.
+
+Each entry shows:
 
 ```text
-Назва розмови
+Conversation title
 YYYY-MM-DD HH:MM
 ```
 
-Дата і час беруться з **першого реального повідомлення розмови**, а не з часу імпорту або назви папки. Чати сортуються за цією датою і часом — від новіших до старіших.
+The timestamp is derived from the **first real message in the conversation**, not the import time or directory name. Conversations are sorted by this timestamp, newest first.
 
-Поле **Пошук архівів...** фільтрує список чатів за назвою.
-
----
-
-## 7. Перегляд розмови
-
-Основна область максимально наближена до звичного представлення ChatGPT.
-
-Повідомлення користувача виділяються окремою **синьою бульбашкою**. Звичайні відповіді ChatGPT показуються окремими блоками.
-
-Viewer приховує службову інформацію сирого export, зокрема reasoning, reasoning recap, thoughts, tool calls та execution output. Фільтрація виконується переважно за структурними полями export.
-
-Важливий виняток: ChatGPT export може зберігати **згенеровані зображення як `role=tool`**. Viewer розпізнає такі повідомлення і не видаляє їх разом зі службовими tool-записами.
+Use **Search archives...** to filter the list by title.
 
 ---
 
-## 8. Вкладення та картинки
+## 7. Conversation view
 
-При імпорті `attachments-index.json` використовується для зв'язування `sediment://...` pointers з реальними файлами у ZIP-томах Helper-а.
+The main view is intentionally close to the familiar ChatGPT layout.
 
-Вкладення копіюються всередину папки конкретного чату, тому після імпорту вони більше не залежать від файлів у `Downloads`.
+User messages are displayed as separate **blue bubbles**. Normal assistant responses are shown as conversation blocks.
+
+The Viewer filters internal export records such as reasoning, reasoning recaps, thoughts, tool calls and execution output based primarily on the export structure rather than simple text matching.
+
+One important exception is generated images: ChatGPT exports may represent generated images as `role=tool`. The Viewer recognizes these image messages and keeps them visible while hiding internal tool records.
 
 ---
 
-## 9. Середня колонка: «Зміст» і «Питання»
+## 8. Attachments and images
 
-Середня колонка має два повноцінні режими навігації по довгому чату.
+During import, `attachments-index.json` maps `sediment://...` pointers to actual files inside the Helper's ZIP volumes.
 
-### Зміст — реалізована семантична навігація по чату
+Attachments are copied into the directory of the corresponding conversation. After import, the archived conversation no longer depends on the source files in `Downloads`.
 
-`Зміст` — уже робоча частина Viewer. Це не автоматичний список заголовків і не пошук ключових слів. Він розділяє довгу розмову на **реальні смислові етапи роботи**, які попередньо формуються за допомогою ChatGPT і зберігаються у `topics.json`.
+---
 
-Дані змісту зберігаються окремо для кожного чату:
+## 9. Middle column: Table of Contents and Questions
+
+The middle column provides two complementary navigation modes for long conversations.
+
+### Table of Contents — semantic conversation navigation
+
+The **Table of Contents** is an implemented feature, not a planned placeholder. It divides a long conversation into meaningful stages rather than merely listing headings or matching keywords.
+
+Each conversation stores its semantic map in:
 
 ```text
-chats/<цей-чат>/topics.json
+chats/<conversation>/topics.json
 ```
 
-Приклад пункту:
+Example topic:
 
 ```json
 {
   "title": "PERF-05 — Gaussian Blur",
   "start_message_id": "abc123",
   "end_message_id": "def456",
-  "summary": "Дослідження впливу Gaussian Blur 9×9 на шум, FPS і стабільність детекції.",
+  "summary": "Study of the effect of Gaussian Blur 9×9 on noise, FPS, and detection stability.",
   "level": 1
 }
 ```
 
-Поля мають такий зміст:
+Fields:
 
-- `title` — читабельна назва теми;
-- `start_message_id` — повідомлення, з якого починається тема;
-- `end_message_id` — останнє повідомлення теми;
-- `summary` — короткий опис того, що відбувалося у цьому фрагменті;
-- `level` — рівень вкладеності пункту змісту.
+- `title` — readable topic title shown in the Table of Contents;
+- `start_message_id` — the message where the topic starts;
+- `end_message_id` — the final message belonging to the topic;
+- `summary` — a short description of what was discussed, tested, decided, or concluded;
+- `level` — nesting level for hierarchical topics.
 
-#### Як створюється зміст
+### Creating the semantic Table of Contents
 
-У вкладці **Зміст** є кнопка:
+In the **Table of Contents** tab, click **Prepare for ChatGPT** (`Підготувати для ChatGPT` in the current UI).
 
-```text
-Підготувати для ChatGPT
-```
-
-Viewer формує файл:
+The Viewer generates:
 
 ```text
 toc_source.md
 ```
 
-У нього потрапляє читабельна послідовність реальних повідомлень поточного чату разом з їх `message_id`. Службові повідомлення при підготовці джерела відфільтровуються.
+This file contains a readable sequence of real user and assistant messages together with their `message_id` values. Internal service/tool messages are filtered out.
 
-У `toc_source.md` автоматично додається інструкція з правилами формування `topics.json`: спочатку потрібно прочитати весь чат і запропонувати звичайний читабельний зміст, потім погодити його з користувачем, і лише після цього сформувати JSON. Перед видачею JSON усі `start_message_id` та `end_message_id` мають бути перевірені за самим `toc_source.md`.
-
-Робочий процес уже виглядає так:
+The Viewer also automatically appends rules for producing `topics.json`. The intended workflow is:
 
 ```text
-архівний чат
+archived conversation
    ↓
-Підготувати для ChatGPT
+Prepare for ChatGPT
    ↓
 toc_source.md
    ↓
-ChatGPT читає весь матеріал
+ChatGPT reads the complete material
    ↓
-пропонує читабельний зміст
+ChatGPT proposes a human-readable table of contents
    ↓
-коригування / погодження
+review / corrections by the user
    ↓
 topics.json
    ↓
-Імпортувати topics.json
+Import topics.json
    ↓
-готовий інтерактивний Зміст у Viewer
+interactive semantic Table of Contents
 ```
 
-#### Імпорт готового змісту
+The rules embedded in `toc_source.md` explicitly require every `start_message_id` and `end_message_id` to be verified against the source file before the final JSON is produced. IDs must never be invented from memory.
 
-Кнопка:
+### Importing `topics.json`
 
-```text
-Імпортувати topics.json
-```
+Click **Import topics.json** (`Імпортувати topics.json` in the current UI).
 
-перевіряє JSON перед записом. Viewer контролює структуру пунктів, `level` та наявність указаних `start_message_id` / `end_message_id` у поточному чаті.
+Before saving the file, the Viewer validates its structure, `level`, and referenced `start_message_id` / `end_message_id` values against the current conversation.
 
-Після успішного імпорту `topics.json` записується саме до папки вибраного чату, а новий зміст одразу з'являється у середній колонці.
+After a successful import, the new semantic Table of Contents appears immediately.
 
-#### Як працює навігація
+### Navigating topics
 
-Клік по пункту змісту прокручує основну розмову до `start_message_id` відповідної теми — так само, як режим **Питання** переходить до конкретного повідомлення користувача.
+Clicking a topic scrolls the main conversation to its `start_message_id`.
 
-Активний пункт **підсвічується**. Під час ручного прокручування Viewer стежить за позицією в чаті та автоматично переносить підсвічування на тему, яку користувач зараз читає. Межі теми визначаються `start_message_id` / `end_message_id`.
+The active topic is **highlighted**. When the conversation is scrolled manually, the Viewer follows the current position and automatically highlights the semantic topic being read. Topic boundaries are determined by `start_message_id` and `end_message_id`.
 
-Таким чином `Зміст` працює не як статичний список, а як **інтерактивна семантична карта великої розмови**.
+This makes the Table of Contents an **interactive semantic map of a long conversation**, rather than a static index.
 
-### Питання
+### Questions
 
-Режим **Питання** показує всі повідомлення користувача як навігаційний список: питання, команди, короткі репліки, посилання, код і повідомлення з вкладеннями.
+The **Questions** mode lists all user messages as navigation links — questions, commands, short replies, URLs, code, and messages with attachments.
 
-Довге повідомлення скорочується приблизно до 130 символів, але слово не обрізається посередині.
+Long entries are shortened to approximately 130 characters without cutting a word in the middle.
 
-Клік по пункту прокручує основний чат точно до відповідного повідомлення.
+Clicking an entry scrolls the main conversation directly to that user message.
 
 ---
 
-## 10. Пошук усередині відкритого чату
+## 10. Search inside an open conversation
 
-У верхній частині основної області є поле **Пошук у чаті...**.
+The **Search in chat...** field searches the currently open conversation.
 
-Viewer знаходить входження тексту у відкритій розмові, підсвічує їх, показує номер поточного результату і загальну кількість та дозволяє переходити між результатами кнопками вгору/вниз.
+Matches are highlighted, the current result and total count are displayed, and the up/down controls move between results.
 
-Це окремий пошук від **Пошуку архівів** у лівій колонці.
+This is separate from the archive-title search in the left column.
 
 ---
 
-## 11. Формат локального архіву
+## 11. Local archive format
 
-Кожна розмова зберігається незалежно:
+Each conversation is stored independently:
 
 ```text
 chats/
-└── 2026-08-07_Червень-Аватарка-Трохи-про-звук-та-сонар/
+└── 2026-08-07_Conversation-title/
     ├── conversation.json
     ├── attachments-index.json
     ├── attachments/
     └── topics.json
 ```
 
-Один HTML-viewer використовується для будь-якої кількості локальних архівів, а самі чати не вшиваються в HTML.
+One HTML Viewer can therefore handle any number of local archives without embedding conversation data into the Viewer itself.
 
 ---
 
-## 12. Ручний імпорт
+## 12. Manual import
+
+A conversation export can also be imported from the command line:
 
 ```bash
 python3 add_archive.py ~/Downloads/chatgpt-run-..._conversations.json
 ```
 
-Для видалення вихідного набору після успішного імпорту:
+To delete the source export set after a successful import:
 
 ```bash
 python3 add_archive.py ~/Downloads/chatgpt-run-..._conversations.json --delete-source
 ```
 
-Через кнопку `+` у Viewer вихідні файли після успішного імпорту видаляються автоматично.
+Imports performed through the Viewer's `+` button automatically remove the successfully processed source set.
 
 ---
 
-## 13. Що вже реалізовано
+## 13. Implemented features
 
-- один Viewer для багатьох архівних чатів;
-- локальне збереження розмов та attachments;
-- імпорт без ручного розпакування ZIP;
-- вибір export безпосередньо з `~/Downloads`;
-- автоматичне очищення обробленого export;
-- сортування чатів за реальним часом першого повідомлення;
-- дата і час під назвою кожного архіву;
-- пошук архіву за назвою;
-- пошук тексту всередині відкритого чату;
-- підсвічування та навігація по результатах пошуку;
-- режим **Питання** як покажчик усіх повідомлень користувача;
-- сині бульбашки повідомлень користувача;
-- приховування службових reasoning/tool записів;
-- підтримка generated images, представлених як tool messages;
-- **семантичний Зміст** на основі `topics.json`;
-- генерація `toc_source.md` безпосередньо з Viewer;
-- автоматичне додавання правил формування `topics.json` у `toc_source.md`;
-- перевірка `message_id` під час імпорту;
-- імпорт готового `topics.json` через інтерфейс;
-- перехід від пункту змісту до точного місця чату;
-- автоматичне підсвічування активного пункту змісту під час читання.
+- one Viewer for many archived conversations;
+- local storage of conversations and attachments;
+- import without manually unpacking ZIP volumes;
+- export selection directly from `~/Downloads`;
+- automatic cleanup of successfully processed exports;
+- sorting by the real timestamp of the first conversation message;
+- date and time shown below every archive title;
+- archive-title search;
+- full-text search inside the open conversation;
+- highlighted search matches and result navigation;
+- **Questions** mode as an index of all user messages;
+- ChatGPT-like blue user-message bubbles;
+- filtering of internal reasoning/tool records;
+- support for generated images represented as tool messages;
+- semantic **Table of Contents** based on `topics.json`;
+- generation of `toc_source.md` directly from the Viewer;
+- automatic inclusion of `topics.json` generation rules in `toc_source.md`;
+- validation of referenced `message_id` values during import;
+- `topics.json` import through the UI;
+- direct navigation from a topic to its conversation location;
+- automatic highlighting of the active semantic topic while reading.
 
 ---
 
-## 14. Семантичний зміст як основна ідея проєкту
+## 14. Why semantic navigation?
 
-Для великих технічних чатів звичайного текстового пошуку недостатньо. Один чат може містити десятки послідовних експериментів, рішень, повернень до попередніх питань і проміжних висновків.
+Ordinary text search is often not enough for long technical ChatGPT conversations. A single chat may contain many consecutive experiments, decisions, returns to earlier questions, implementation attempts, and intermediate conclusions.
 
-Тому Viewer використовує два різні способи навігації:
+Archive Viewer therefore provides two different navigation models:
 
 ```text
-Питання → хронологічний покажчик повідомлень користувача
-Зміст   → семантична карта етапів і тем розмови
+Questions         → chronological index of user messages
+Table of Contents → semantic map of conversation stages and topics
 ```
 
-У поточній реалізації семантичний аналіз виконується ChatGPT на основі підготовленого Viewer-ом `toc_source.md`, а сам Viewer відповідає за підготовку матеріалу, збереження `message_id`, перевірку та імпорт `topics.json`, переходи по темах і підсвічування активної теми.
+In the current implementation, ChatGPT performs semantic analysis using the Viewer-generated `toc_source.md`. The Viewer itself prepares the source material, preserves message IDs, validates and imports `topics.json`, performs topic navigation, and highlights the active topic.
 
-`topics.json` залишається окремим від `conversation.json`: оригінальний архів розмови не модифікується, а семантична розмітка може уточнюватися та перегенеровуватися незалежно.
-
----
-
-## 15. Приватність
-
-Viewer працює локально. `view.py` слухає тільки `127.0.0.1`, тому локальний архів не публікується в Інтернет автоматично.
-
-Самі файли у `chats/` можуть містити повний текст розмов та вкладення. Не додавайте приватні архіви в Git і не публікуйте каталог `chats/` без перевірки його вмісту.
+`topics.json` remains separate from `conversation.json`: the original archived conversation is not modified, while the semantic annotation can be refined or regenerated independently.
 
 ---
 
-## Використані проєкти
+## 15. Privacy
 
-- ChatGPT Helper: https://github.com/D1DX/chatgpt-helper
-- ChatGPT Archive Viewer: https://github.com/o-petrovich/chatgpt-archive-viewer
+The Viewer runs locally. `view.py` listens only on:
+
+```text
+127.0.0.1
+```
+
+so your archive is not automatically published to the Internet.
+
+The files under `chats/` may contain complete conversation text and attachments. Do not commit or publish that directory without reviewing its contents.
+
+---
+
+## Related projects
+
+- [ChatGPT Helper — D1DX/chatgpt-helper](https://github.com/D1DX/chatgpt-helper)
+- [ChatGPT Archive Viewer — o-petrovich/chatgpt-archive-viewer](https://github.com/o-petrovich/chatgpt-archive-viewer)
