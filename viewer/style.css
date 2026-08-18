@@ -12,7 +12,9 @@ html,body{margin:0;height:100%;font-family:system-ui,-apple-system,"Segoe UI",sa
 .toc{width:300px;min-width:300px;background:var(--panel);border-right:1px solid var(--border);padding:12px 10px 16px;overflow:auto}
 .chat-scroll{flex:1;overflow:auto;scroll-behavior:smooth}.messages{max-width:none;width:100%;margin:0;padding:26px 42px 120px 26px}.messages.empty{color:var(--muted);text-align:center;padding-top:120px}
 .msg{margin:20px 0;scroll-margin-top:18px}.msg.user{display:flex;justify-content:flex-end}.msg.user .bubble{max-width:78%;background:var(--user);padding:11px 16px;border-radius:20px}.msg.assistant .bubble{padding:2px 0}
-.msg.tool .bubble,.msg.system .bubble{border:1px solid var(--border);background:#1d1d1d;padding:10px 12px;border-radius:8px;color:#c9c9c9}.role{font-size:11px;color:var(--muted);margin-bottom:5px}.msg.user .role{display:none}
+.msg.tool .bubble,.msg.system .bubble{border:1px solid var(--border);background:#1d1d1d;padding:10px 12px;border-radius:8px;color:#c9c9c9}
+.msg.tool:has(img) .bubble{border:0;background:transparent;padding:2px 0;color:var(--text)}.msg.tool:has(img) .role{display:none}
+.role{font-size:11px;color:var(--muted);margin-bottom:5px}.msg.user .role{display:none}
 .content{line-height:1.58;overflow-wrap:anywhere}.content p{margin:.65em 0}.content pre{background:#111;border:1px solid var(--border);padding:12px 14px;border-radius:8px;overflow:auto;white-space:pre-wrap}.content code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#303030;padding:1px 5px;border-radius:4px}.content pre code{background:transparent;padding:0}
 .content img{display:block;max-width:100%;max-height:720px;object-fit:contain;border-radius:10px;margin:12px 0;border:1px solid var(--border)}.content a{color:var(--accent)}
 details.reasoning{border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:#1d1d1d}details.reasoning summary{cursor:pointer;color:#c8c8c8}.missing{color:#ffb4b4;font-size:13px}
