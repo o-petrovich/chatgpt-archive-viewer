@@ -1,0 +1,17 @@
+.toc-link.topic-link.active-topic {
+  position: relative;
+  background: #2a2a2a;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.toc-link.topic-link.active-topic::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--accent);
+}
