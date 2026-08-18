@@ -24,13 +24,44 @@ Viewer не потребує повторного відкривання ста�
 
 ## 1. Що таке ChatGPT Helper
 
-`ChatGPT Helper` — окреме розширення для браузера, яке використовується для отримання даних конкретної розмови ChatGPT.
+[`D1DX/chatgpt-helper`](https://github.com/D1DX/chatgpt-helper) — окреме Chrome-розширення для експорту розмов і memories з ChatGPT.
 
-Сам `ChatGPT Archive Viewer` не завантажує розмову з ChatGPT. Його задача інша: прийняти вже створений Helper-ом export, розкласти його у локальний архів і показати у зручному HTML-viewer.
+Сам `ChatGPT Archive Viewer` не завантажує розмову безпосередньо з ChatGPT. Його задача інша: прийняти вже створений Helper-ом export, розкласти його у локальний архів і показати у зручному HTML-viewer.
 
-У ChatGPT Helper для цього використовується вкладка **Export Conversations**.
+ChatGPT Helper працює через активну сесію ChatGPT у браузері, викликає внутрішній web API ChatGPT і може експортувати розмови в JSON, Markdown, JSONL, HTML, CSV або plain text. Для нашого Viewer потрібен саме **JSON export з attachments**.
 
-Для одного чату достатньо його Conversation ID. Наприклад, якщо адреса розмови має вигляд:
+За документацією Helper, обробка виконується локально у браузері; зовнішній сервер для передачі архіву не використовується. Водночас автор прямо попереджає, що розширення використовує недокументований внутрішній API ChatGPT, який може змінюватися.
+
+### Встановлення ChatGPT Helper
+
+Клонуйте репозиторій:
+
+```bash
+git clone https://github.com/D1DX/chatgpt-helper.git
+```
+
+Потім у Chrome:
+
+1. Відкрийте:
+
+   ```text
+   chrome://extensions
+   ```
+
+2. Увімкніть **Developer mode**.
+3. Натисніть **Load unpacked**.
+4. Виберіть каталог `chatgpt-helper`, який щойно клонували.
+5. Іконка **ChatGPT Helper** з'явиться на панелі розширень Chrome.
+
+Перед використанням відкрийте `chatgpt.com` і переконайтеся, що ви увійшли у свій обліковий запис.
+
+---
+
+## 2. Як отримати архів конкретної розмови
+
+Для одного чату достатньо його Conversation ID.
+
+Наприклад, якщо адреса має вигляд:
 
 ```text
 https://chatgpt.com/c/6a7f4b0d-4e70-83ed-9060-e7234ac3ea0d
@@ -42,17 +73,7 @@ https://chatgpt.com/c/6a7f4b0d-4e70-83ed-9060-e7234ac3ea0d
 6a7f4b0d-4e70-83ed-9060-e7234ac3ea0d
 ```
 
-### Де взяти ChatGPT Helper
-
-ChatGPT Helper є окремим проєктом/розширенням і не входить до цього репозиторію.
-
-На цей момент README навмисно не містить вигаданого посилання на інсталяцію Helper. Додайте сюди посилання на офіційний репозиторій або сторінку розширення, з якої встановлюєте вашу версію ChatGPT Helper.
-
-Після встановлення розширення його іконка з'являється у браузері.
-
----
-
-## 2. Як отримати архів розмови
+Далі:
 
 1. Відкрийте потрібний чат на `chatgpt.com`.
 2. Скопіюйте Conversation ID з адресного рядка браузера — це частина після `/c/`.
@@ -430,6 +451,7 @@ Viewer працює локально.
 
 ---
 
-## Repository
+## Використані проєкти
 
-GitHub: `o-petrovich/chatgpt-archive-viewer`
+- ChatGPT Helper: https://github.com/D1DX/chatgpt-helper
+- ChatGPT Archive Viewer: https://github.com/o-petrovich/chatgpt-archive-viewer
