@@ -19,10 +19,6 @@ function messageHasImage(message) {
 }
 
 
-/*
- * Keep generated images even though ChatGPT export stores them as role=tool.
- * Hide actual reasoning/tool traffic using structural fields from the export.
- */
 isServiceMessage = function (message) {
   const role = message?.author?.role || "";
   const content = message?.content || {};
@@ -122,10 +118,6 @@ function formatCatalogDate(timestamp) {
 
 
 async function enrichAndSortCatalog() {
-  if (!Array.isArray(catalog) || !catalog.length) {
-    return;
-  }
-
   await Promise.all(
     catalog.map(async item => {
       try {
@@ -158,10 +150,21 @@ async function enrichAndSortCatalog() {
 }
 
 
-/* app.js has already started loading the initial catalog by the time this
- * script executes. Give it one event-loop turn, then enrich the loaded list.
- */
-window.setTimeout(
-  enrichAndSortCatalog,
-  0
-);
+function waitForCatalogAndSort(attempt = 0) {
+  if (Array.isArray(catalog) && catalog.length) {
+    enrichAndSortCatalog();
+    return;
+  }
+
+  if (attempt >= 40) {
+    return;
+  }
+
+  window.setTimeout(
+    () => waitForCatalogAndSort(attempt + 1),
+    50
+  );
+}
+
+
+waitForCatalogAndSort();
