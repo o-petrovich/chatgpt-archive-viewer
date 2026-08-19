@@ -61,6 +61,16 @@ function decorateTopicLinks() {
   scheduleActiveTopicUpdate();
 }
 
+function downloadFilenameFromResponse(response, fallback) {
+  const disposition = response.headers.get("Content-Disposition") || "";
+  const utf8 = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8) {
+    try { return decodeURIComponent(utf8[1]); }
+    catch (_) { return utf8[1]; }
+  }
+  return fallback;
+}
+
 const originalRenderMiddleNavigationForTocPolish = renderMiddleNavigation;
 renderMiddleNavigation = function () {
   originalRenderMiddleNavigationForTocPolish();
@@ -85,7 +95,7 @@ async function prepareTocSourceWithRules() {
     return;
   }
 
-  setTocStatus("Готую toc_source.md…");
+  setTocStatus("Готую toc_source для вибраного чату…");
 
   try {
     const [sourceResponse, rulesResponse] = await Promise.all([
@@ -112,16 +122,17 @@ async function prepareTocSourceWithRules() {
     const blob = new Blob([source], {type: "text/markdown;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+    const fallback = `toc_source_${currentEntry.title || "chat"}.md`;
 
     link.href = url;
-    link.download = "toc_source.md";
+    link.download = downloadFilenameFromResponse(sourceResponse, fallback);
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
 
     setTocStatus(
-      "toc_source.md готовий разом із правилами формування topics.json.",
+      `${link.download} готовий разом із правилами формування topics.json.`,
       "ok"
     );
   }
@@ -130,8 +141,44 @@ async function prepareTocSourceWithRules() {
   }
 }
 
+async function downloadTopicsForCurrentChat() {
+  if (!currentEntry) {
+    setTocStatus("Спочатку оберіть чат.", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/topics-download?chat_id=${encodeURIComponent(currentEntry.id)}`,
+      {cache: "no-store"}
+    );
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `${response.status} ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const fallback = `topics_${currentEntry.title || "chat"}.json`;
+    link.href = url;
+    link.download = downloadFilenameFromResponse(response, fallback);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setTocStatus(`${link.download} готовий.`, "ok");
+  }
+  catch (error) {
+    setTocStatus(error.message || String(error), "error");
+  }
+}
+
 /* Replace the original v5 button handler with the rules-aware generator. */
 $("#prepareTocBtn").onclick = prepareTocSourceWithRules;
+
+const downloadTopicsBtn = $("#downloadTopicsBtn");
+if (downloadTopicsBtn) downloadTopicsBtn.onclick = downloadTopicsForCurrentChat;
 
 /* Initial state after all scripts are loaded. */
 window.setTimeout(() => {
