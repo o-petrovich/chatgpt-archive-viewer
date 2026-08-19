@@ -8,6 +8,7 @@ import webbrowser
 import threading
 import json
 import urllib.parse
+import re
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = Path.home() / "Downloads"
@@ -175,14 +176,37 @@ def format_time(timestamp):
     return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def download_safe_title(title):
+    title = str(title or "Без назви").strip()
+    title = re.sub(r'[\\/:*?"<>|]+', "-", title)
+    title = re.sub(r"\s+", " ", title).strip(" .-")
+    return title[:120] or "Без назви"
+
+
 def make_toc_source(conv, entry):
     lines = [
         f"# {conv.get('title') or entry.get('title') or 'Без назви'}",
         "",
         f"Conversation ID: {conv.get('conversation_id') or entry.get('id') or ''}",
         "",
-        "> Цей файл підготовлено для створення семантичного змісту.",
-        "> Важливо: `message_id` треба зберегти при підготовці `topics.json`.",
+        "> ## Призначення файла",
+        ">",
+        "> Цей файл є повним текстовим представленням архівованого ChatGPT-чату",
+        "> зі збереженням ролей, `message_id` і часу повідомлень.",
+        ">",
+        "> Файл використовується для двох задач:",
+        ">",
+        "> 1. як джерело для створення та перевірки семантичного змісту `topics.json`;",
+        "> 2. як повна історія розмови для ChatGPT при продовженні роботи над проєктом",
+        ">    у нових чатах, коли `PROJECT_STATE.md`, `DECISIONS.md` або короткого",
+        ">    `summary` у `topics.json` недостатньо.",
+        ">",
+        "> `message_id` є стабільними посиланнями на повідомлення цього чату.",
+        "> Значення `start_message_id` та `end_message_id` у `topics.json`",
+        "> повинні посилатися на реальні `message_id` цього файла.",
+        ">",
+        "> Не скорочувати і не перефразовувати текст повідомлень:",
+        "> цей файл є першоджерелом історії розмови.",
         "",
         "---",
         "",
@@ -306,13 +330,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def send_text_download(self, text, filename):
+    def send_text_download(self, text, filename, content_type="text/markdown; charset=utf-8"):
         body = text.encode("utf-8")
         self.send_response(200)
-        self.send_header("Content-Type", "text/markdown; charset=utf-8")
+        self.send_header("Content-Type", content_type)
+        encoded = urllib.parse.quote(filename)
         self.send_header(
             "Content-Disposition",
-            f'attachment; filename="{filename}"'
+            f"attachment; filename*=UTF-8''{encoded}"
         )
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -367,8 +392,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 entry, _, conversation_path, _ = chat_paths(chat_id)
                 conv = load_json(conversation_path)
                 markdown = make_toc_source(conv, entry)
+                title = download_safe_title(conv.get("title") or entry.get("title"))
 
-                self.send_text_download(markdown, "toc_source.md")
+                self.send_text_download(markdown, f"toc_source_{title}.md")
+            except Exception as error:
+                self.send_json({"ok": False, "error": str(error)}, 400)
+            return
+
+        if parsed.path == "/api/topics-download":
+            try:
+                query = urllib.parse.parse_qs(parsed.query)
+                chat_id = (query.get("chat_id") or [""])[0]
+
+                if not chat_id:
+                    raise RuntimeError("Не вказаний chat_id")
+
+                entry, _, conversation_path, topics_path = chat_paths(chat_id)
+                conv = load_json(conversation_path)
+                if not topics_path.is_file():
+                    raise RuntimeError("topics.json не знайдено")
+
+                topics = load_json(topics_path)
+                text = json.dumps(topics, ensure_ascii=False, indent=2) + "\n"
+                title = download_safe_title(conv.get("title") or entry.get("title"))
+                self.send_text_download(
+                    text,
+                    f"topics_{title}.json",
+                    "application/json; charset=utf-8"
+                )
             except Exception as error:
                 self.send_json({"ok": False, "error": str(error)}, 400)
             return
