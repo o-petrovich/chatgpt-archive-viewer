@@ -399,31 +399,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({"ok": False, "error": str(error)}, 400)
             return
 
-        if parsed.path == "/api/topics-download":
-            try:
-                query = urllib.parse.parse_qs(parsed.query)
-                chat_id = (query.get("chat_id") or [""])[0]
-
-                if not chat_id:
-                    raise RuntimeError("Не вказаний chat_id")
-
-                entry, _, conversation_path, topics_path = chat_paths(chat_id)
-                conv = load_json(conversation_path)
-                if not topics_path.is_file():
-                    raise RuntimeError("topics.json не знайдено")
-
-                topics = load_json(topics_path)
-                text = json.dumps(topics, ensure_ascii=False, indent=2) + "\n"
-                title = download_safe_title(conv.get("title") or entry.get("title"))
-                self.send_text_download(
-                    text,
-                    f"topics_{title}.json",
-                    "application/json; charset=utf-8"
-                )
-            except Exception as error:
-                self.send_json({"ok": False, "error": str(error)}, 400)
-            return
-
         return super().do_GET()
 
     def do_POST(self):
